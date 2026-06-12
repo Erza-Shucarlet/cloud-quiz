@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand / Primary — 来自角色共同的深紫/蓝紫发色 */
+  --color-yun-primary: #7C3AED;
+  --color-yun-primary-light: #A78BFA;
+  --color-yun-primary-pink: #F472B6;
+
+  /* Accent — 天空青 */
+  --color-yun-accent: #38D5E8;
+  /* Score — 星金币色 */
+  --color-yun-score: #FBBF24;
+
+  /* Background */
+  --color-yun-bg: #F7F2FF;
+  --color-yun-bg-sky: #E9FBFF;
+
+  /* Surface */
+  --color-yun-surface: #FFFFFF;
+  --color-yun-surface-soft: #FAF7FF;
+  --color-yun-border: #E9D5FF;
+
+  /* Feedback */
+  --color-yun-correct: #34D399;
+  --color-yun-wrong: #FF5C8A;
+
+  /* Text */
+  --color-yun-text: #2B2140;
+  --color-yun-text-muted: #7B6A99;
+  --color-yun-text-light: #FFFFFF;
+
+  /* Radius */
+  --radius-yun-card: 1.25rem;
+
+  /* Shadow */
+  --shadow-yun-card: 0 10px 30px rgba(124, 58, 237, 0.16);
+}
+
+/* ── 主渐变（紫色→樱粉）── */
+.bg-yun-main-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-yun-primary) 0%,
+    var(--color-yun-primary-light) 52%,
+    var(--color-yun-primary-pink) 100%
+  );
+}
+
+/* ── 文字渐变 ── */
+.text-yun-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-yun-primary) 0%,
+    var(--color-yun-primary-pink) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── 基础重置 ── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: linear-gradient(
+    180deg,
+    var(--color-yun-bg) 0%,
+    var(--color-yun-bg-sky) 100%
+  );
+  color: var(--color-yun-text);
+  font-family:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP',
+    'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-yun-border);
+  border-radius: 2px;
+}
+
+/* ── 组件样式 ── */
+
+/* 主按钮 — 全部直接 CSS，不走 @apply 自定义 utility */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-yun-primary) 0%,
+    var(--color-yun-primary-light) 52%,
+    var(--color-yun-primary-pink) 100%
+  );
+  color: #fff;
+  font-weight: 700;
+  border-radius: 999px;
+  border: none;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.28);
+  transition: all 0.2s ease-out;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.35);
+  transform: scale(1.05);
+}
+.btn-primary:active {
+  transform: scale(0.95);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 次级按钮 */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background: #fff;
+  border: 2px solid var(--color-yun-border);
+  color: var(--color-yun-primary);
+  font-weight: 700;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.08);
+  transition: all 0.2s ease-out;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  border-color: var(--color-yun-primary-light);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.14);
+  transform: scale(1.05);
+}
+.btn-secondary:active {
+  transform: scale(0.95);
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: var(--radius-yun-card);
+  padding: 1rem;
+  box-shadow: var(--shadow-yun-card);
+}
+@media (min-width: 640px) {
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+/* 软卡片 */
+.card-soft {
+  border-radius: var(--radius-yun-card);
+  padding: 1rem;
+  background: var(--color-yun-surface-soft);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.06);
+}
+@media (min-width: 640px) {
+  .card-soft {
+    padding: 1.5rem;
+  }
+}
+
+/* 弹窗动画 */
+.animate-pop {
+  animation: pop 0.3s ease-out;
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
