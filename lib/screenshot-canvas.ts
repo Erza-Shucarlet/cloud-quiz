@@ -227,9 +227,11 @@ export async function generateScreenshot(data: ScreenshotData): Promise<Blob> {
       qrImg.onerror = reject;
       qrImg.src = qrDataUrl;
     });
-    // 卡片右下角: 720-120-40 = 560, footerY-10-120 = footerY-130
-    ctx.drawImage(qrImg, W - 170, footerY - 20, 120, 120);
-    text(ctx, '扫码来玩', W - 110, footerY + 110, 12, MUTED, '600');
+    // 底部居中
+    const qrX = (W - 120) / 2;
+    const qrY = footerY + 60;
+    ctx.drawImage(qrImg, qrX, qrY, 120, 120);
+    text(ctx, '扫码测测你有多懂云宇宙', cx, qrY + 136, 11, MUTED, '600');
   } catch {
     // QR 库不可用时静默跳过
   }
