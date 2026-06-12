@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
 export async function GET(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
   const { searchParams } = new URL(request.url);
   const table = searchParams.get('table') || 'leaderboard';
   const date = searchParams.get('date');
@@ -11,40 +11,57 @@ export async function GET(request: NextRequest) {
   const order = searchParams.get('order');
   const limit = searchParams.get('limit');
 
-  let url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}`;
-  if (date) url += `&date=eq.${date}`;
-  if (order) url += `&order=${order}`;
-  if (limit) url += `&limit=${limit}`;
+  try {
+    let url = `${supabaseUrl}/rest/v1/${table}?select=${encodeURIComponent(select)}`;
+    if (date) url += `&date=eq.${date}`;
+    if (order) url += `&order=${order}`;
+    if (limit) url += `&limit=${limit}`;
 
-  const res = await fetch(url, {
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-    },
-  });
+    const res = await fetch(url, {
+      headers: {
+        apikey: supabaseKey || '',
+        Authorization: `Bearer ${supabaseKey || ''}`,
+      },
+    });
 
-  const data = await res.json();
-  return NextResponse.json(data);
+    if (!res.ok) {
+      const err = await res.text();
+      return NextResponse.json({ error: err }, { status: res.status });
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const table = body.table || 'leaderboard';
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  const url = `${SUPABASE_URL}/rest/v1/${table}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
-    },
-    body: JSON.stringify(body.data),
-  });
+  try {
+    const body = await request.json();
+    const table = body.table || 'leaderboard';
 
-  if (!res.ok) {
-    return NextResponse.json({ error: await res.text() }, { status: 500 });
+    const res = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        apikey: supabaseKey || '',
+        Authorization: `Bearer ${supabaseKey || ''}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify(body.data),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      return NextResponse.json({ error: err }, { status: res.status });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-  return NextResponse.json({ success: true });
 }
