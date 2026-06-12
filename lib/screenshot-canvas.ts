@@ -215,6 +215,25 @@ export async function generateScreenshot(data: ScreenshotData): Promise<Blob> {
   text(ctx, 'SHARE YOUR YUN RESULT', cx, footerY, 14, MUTED, '700');
   text(ctx, '☁️ ⭐ 💜 ⭐ ☁️', cx, footerY + 44, 26, DARK, '700');
 
+  // ── 二维码 ──
+  try {
+    const QRCode = await import('qrcode');
+    const qrDataUrl = await QRCode.toDataURL('https://cloud-quiz.chubbyducky.com', {
+      width: 120, margin: 1, color: { dark: '#2B2140', light: '#F7F2FF' }
+    });
+    const qrImg = new Image();
+    await new Promise<void>((resolve, reject) => {
+      qrImg.onload = () => resolve();
+      qrImg.onerror = reject;
+      qrImg.src = qrDataUrl;
+    });
+    // 卡片右下角: 720-120-40 = 560, footerY-10-120 = footerY-130
+    ctx.drawImage(qrImg, W - 170, footerY - 20, 120, 120);
+    text(ctx, '扫码来玩', W - 110, footerY + 110, 12, MUTED, '600');
+  } catch {
+    // QR 库不可用时静默跳过
+  }
+
   const blob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob((b) => resolve(b), 'image/png');
   });
