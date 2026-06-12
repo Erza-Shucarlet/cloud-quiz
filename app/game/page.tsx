@@ -25,6 +25,7 @@ export default function GamePage() {
   const [feedback, setFeedback] = useState<FeedbackState>(null);
   const [elapsed, setElapsed] = useState(0);
   const nicknameRef = useRef('神秘玩家');
+  const preGameRef = useRef<GameState | null>(null);
 
   // 预加载 → 就绪
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function GamePage() {
 
     // 先生成题目，获取需要的图片列表
     const game = createGame(nicknameRef.current);
+    preGameRef.current = game; // 存起来，startGame 直接用
     const allPaths = game.questions.flatMap((q) => q.options);
 
     preloadImages(allPaths, (loaded, total) => {
@@ -45,10 +47,10 @@ export default function GamePage() {
     });
   }, []);
 
-  // 开始游戏（用户点按钮才触发）
+  // 开始游戏（直接复用预加载的题目）
   const startGame = useCallback(() => {
     setPhase('playing');
-    setGameState(createGame(nicknameRef.current));
+    setGameState(preGameRef.current!);
   }, []);
 
   // 计时器
