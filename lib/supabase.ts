@@ -37,7 +37,6 @@ export async function submitScore(entry: LeaderboardEntry): Promise<boolean> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        table: 'leaderboard',
         data: {
           nickname: entry.nickname,
           score: entry.score,

@@ -1,38 +1,41 @@
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
-  return NextResponse.json({ ok: true, time: Date.now() });
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+function getClient() {
+  return createClient(supabaseUrl, supabaseKey);
+}
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const date = searchParams.get('date');
+
+  try {
+    const supabase = getClient();
+    let query = supabase.from('leaderboard').select('*').order('score', { ascending: false }).order('time_seconds', { ascending: true }).limit(50);
+    if (date) query = query.eq('date', date);
+
+    const { data, error } = await query;
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json(data || []);
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
   try {
     const body = await request.json();
-    const { table, data } = body;
-    if (!table || !data) return NextResponse.json({ error: 'Missing table or data' }, { status: 400 });
+    const supabase = getClient();
 
-    const targetUrl = `${supabaseUrl}/rest/v1/${table}`;
-    const res = await fetch(targetUrl, {
-      method: 'POST',
-      headers: {
-        apikey: supabaseKey || '',
-        Authorization: `Bearer ${supabaseKey || ''}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=minimal',
-      },
-      body: JSON.stringify(data),
-    });
+    const { data, error } = await supabase.from('leaderboard').insert(body.data).select();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      return NextResponse.json({ error: errText, supabaseStatus: res.status }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }
