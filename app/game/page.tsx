@@ -7,7 +7,7 @@ import ProgressBar from '@/components/ProgressBar';
 import { createGame, submitAnswer, formatTime } from '@/lib/game-engine';
 import type { GameState, Question } from '@/lib/types';
 import { getSessionValue, setSessionValue } from '@/lib/session';
-import { preloadAllImages } from '@/lib/preload';
+import { preloadImages } from '@/lib/preload';
 
 type FeedbackState = {
   question: Question;
@@ -26,7 +26,7 @@ export default function GamePage() {
   const [elapsed, setElapsed] = useState(0);
   const nicknameRef = useRef('神秘玩家');
 
-  // 预加载图片 → 就绪
+  // 预加载 → 就绪
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     nicknameRef.current =
@@ -34,7 +34,11 @@ export default function GamePage() {
       getSessionValue('quiz-nickname') ||
       '神秘玩家';
 
-    preloadAllImages((loaded, total) => {
+    // 先生成题目，获取需要的图片列表
+    const game = createGame(nicknameRef.current);
+    const allPaths = game.questions.flatMap((q) => q.options);
+
+    preloadImages(allPaths, (loaded, total) => {
       setLoadProgress({ loaded, total });
     }).then(() => {
       setPhase('ready');
