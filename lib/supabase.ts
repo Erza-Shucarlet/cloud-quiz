@@ -13,14 +13,17 @@ export function getSupabase() {
   return createClient(supabaseUrl, supabaseAnonKey);
 }
 
-/** 从 Supabase 获取排行榜 */
+/** 从 Supabase 获取今日排行榜 */
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
   const supabase = getSupabase();
   if (!supabase) return [];
 
+  const today = new Date().toISOString().split('T')[0];
+
   const { data, error } = await supabase
     .from('leaderboard')
     .select('*')
+    .eq('date', today)
     .order('score', { ascending: false })
     .order('time_seconds', { ascending: true })
     .limit(50);

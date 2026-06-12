@@ -23,16 +23,17 @@ function saveLocalLeaderboard(entries: LeaderboardEntry[]) {
   }
 }
 
-/** 获取排行榜（localStorage 降级） */
+/** 获取排行榜（localStorage 降级，只取今日） */
 export function getLocalEntries(): LeaderboardEntry[] {
   const entries = getLocalLeaderboard();
-  // 排序：得分降序 → 用时升序
-  entries.sort((a, b) => {
+  const today = new Date().toISOString().split('T')[0];
+  const todayEntries = entries.filter((e) => e.date === today);
+  todayEntries.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     return a.time_seconds - b.time_seconds;
   });
   // 添加排名
-  return entries.map((e, i) => ({ ...e, rank: i + 1 }));
+  return todayEntries.map((e, i) => ({ ...e, rank: i + 1 }));
 }
 
 /** 添加一条记录到本地排行榜 */
